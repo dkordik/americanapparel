@@ -1,0 +1,5 @@
+echo Starting lighttpd and node.js...
+echo
+echo POINT YOUR BROWSER TO HTTP://LOCALHOST:3000
+echo
+lighttpd -D -f config & coffee node.coffee

@@ -49,7 +49,7 @@ randomShowId = () ->
 
 blacklist =
   [ 1284, 360, 1218, 264, 1232, 782, 389, 673, 541, 935, 800, 952,
-  878, 415, 216, 1309, 537, 295, 1228 ]
+  878, 415, 216, 1309, 537, 295, 1228, 637 ]
 
 isBlacklisted = (id) ->
   blacklist.indexOf(id) > -1
@@ -74,7 +74,7 @@ server = (req, res) ->
 
 port = 1337
 http.createServer(server).listen(port)
-console.log "Server running at http://127.0.0.1:#{port}/"
+console.log "[Node running at http://127.0.0.1:#{port}/]"
 
 updateLatestShowId()  
   
