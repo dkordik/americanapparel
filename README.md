@@ -2,9 +2,12 @@ Phantom.js + node.js + client side js = American Apparel slideshow. Makes for gr
 
 ##Requirements##
 
+- coffee
 - phantom.js
 - node.js + jsdom
+- lighttpd (or some other http server)
 
 ##Usage##
 
-coffee node.coffee, then open index.html on a local webserver
+Run `./run` if you have lighttpd in your path.
+If not, `coffee node.coffee` and run `index.html` from your http server of choice and hit up http://localhost:3000. Oh, and fullscreen that sucker.
