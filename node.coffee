@@ -1,6 +1,7 @@
 http = require 'http'
 spawn = require('child_process').spawn
-jsdom = require 'jsdom'
+request = require 'request'
+cheerio = require 'cheerio'
 
 showIdFloor = 100
 latestShowId = 1300
@@ -18,31 +19,34 @@ updateLatestShowId = () ->
     slideshowUrls = JSON.parse(data)
     updateLatestShowIdFromPage(url) for url in slideshowUrls
   phantomjs.on 'exit', (code) ->
+    console.log "phantomjs exited with #{code}."
     phantomjs = null
 
 updateLatestShowIdFromPage = (pageUrl) ->
-  jsdom.env pageUrl, [jqueryCdn], (e, w) ->
-    showId = parseInt w.$("iframe:first").prop("src").match(new RegExp(/[0-9]+/))[0]
-    if showId > latestShowId
-      latestShowId = showId
-      console.log "Newest slideshow ID: #{latestShowId}"
+  request pageUrl, (err, resp, html) ->
+    if !err && resp.statusCode == 200
+      $ = cheerio.load html
+      showId = parseInt $("iframe:first").attr("src").match(new RegExp(/[0-9]+/))[0]
+      if showId > latestShowId
+        latestShowId = showId
+        console.log "Newest slideshow ID: #{latestShowId}"
 
 getImages = (showId, res) ->
   imgUrls = []
-  currentShowUrl = "http://www.americanapparel.net/flash/src/auto/" + showId + "/"
+  currentShowUrl = "http://www.americanapparel.net/flash/src/auto/" + showId
   console.log "Getting show: #{currentShowUrl}"
-  jsdom.env "#{currentShowUrl}slidedata.xml", [jqueryCdn], (e, w) ->
-    w.$("slide").each () ->
-      imgUrls.push currentShowUrl + w.$(this).attr("src")
-    if imgUrls.length % 2 != 0
-      imgUrls.push imgUrls[0] #repeat the first image to keep the layout even
-    res.end JSON.stringify imgUrls
-    imgUrls = null
-    if latestShowId >= showIdFloor
-      res.end JSON.stringify imgUrls
-    else
-      updateLatestShowId()
-      res.end JSON.stringify {'updateMsg':updateMsg}
+  request "#{currentShowUrl}/slidedata.xml", (err, resp, html) ->
+    if !err && resp.statusCode == 200
+      $ = cheerio.load html
+      $("slide").each () ->
+        imgUrls.push currentShowUrl + "/" + $(this).attr("src")
+      if imgUrls.length % 2 != 0
+        imgUrls.push imgUrls[0] #repeat the first image to keep the layout even
+      if latestShowId >= showIdFloor
+        res.end JSON.stringify imgUrls
+      else
+        updateLatestShowId()
+        res.end JSON.stringify {'updateMsg':updateMsg}
       
 randomShowId = () ->
   Math.floor( Math.random() * (latestShowId - showIdFloor) ) + showIdFloor

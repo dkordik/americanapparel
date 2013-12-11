@@ -16,7 +16,8 @@
   ],
   "author": "Dan Kordik",
   "dependencies": {
-    "jsdom": "= 0.2.8"
+    "cheerio": "= 0.12.4",
+    "request": "= 2.29.0"
   },
   "license": "MIT",
   "bugs": {
