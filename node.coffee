@@ -5,7 +5,7 @@ jsdom = require 'jsdom'
 showIdFloor = 100
 latestShowId = 1300
 updateMsg = "Dead end"
-jquery = 'jquery-1.6.1.min.js'
+jqueryCdn = 'http://code.jquery.com/jquery-1.6.1.min.js'
 
 updateLatestShowId = () ->
   urls = []
@@ -21,7 +21,7 @@ updateLatestShowId = () ->
     phantomjs = null
 
 updateLatestShowIdFromPage = (pageUrl) ->
-  jsdom.env pageUrl, [jquery], (e, w) ->
+  jsdom.env pageUrl, [jqueryCdn], (e, w) ->
     showId = parseInt w.$("iframe:first").prop("src").match(new RegExp(/[0-9]+/))[0]
     if showId > latestShowId
       latestShowId = showId
@@ -31,7 +31,7 @@ getImages = (showId, res) ->
   imgUrls = []
   currentShowUrl = "http://www.americanapparel.net/flash/src/auto/" + showId + "/"
   console.log "Getting show: #{currentShowUrl}"
-  jsdom.env "#{currentShowUrl}slidedata.xml", ['jquery-1.6.1.min.js'], (e, w) ->
+  jsdom.env "#{currentShowUrl}slidedata.xml", [jqueryCdn], (e, w) ->
     w.$("slide").each () ->
       imgUrls.push currentShowUrl + w.$(this).attr("src")
     if imgUrls.length % 2 != 0
